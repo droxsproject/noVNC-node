@@ -2941,17 +2941,39 @@ RFB.prototype = {
 	},
 
 	sendCtrlAltDel: function () {
-		if (this._rfb_state !== 'normal' || this._view_only) { return false; }
+		//if (this._rfb_state !== 'normal' || this._view_only) { return false; }
 
+    console.log('novnc');
 		var arr = [];
-		arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Control_L, 1));
+		arr = arr.concat(RFB.messages.keyEvent(0xff1b, 1));
 		arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Alt_L, 1));
 		arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Delete, 1));
 		arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Delete, 0));
 		arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Alt_L, 0));
-		arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Control_L, 0));
+		arr = arr.concat(RFB.messages.keyEvent(0xff1b, 0));
+    console.log(arr);
 		this._sock.send(arr);
 	},
+  navigate: function (address) {
+    var arr = [];
+
+    arr = arr.concat(RFB.messages.keyEvent(Keys.XK_F6, 1));
+    arr = arr.concat(RFB.messages.keyEvent(Keys.XK_F6, 0));
+    this._sock.send(arr);
+
+    for (var i = 0, len = address.length; i < len; i++) {
+      var arr = [];
+      arr = arr.concat(RFB.messages.keyEvent(address.charCodeAt(i), 1));
+      arr = arr.concat(RFB.messages.keyEvent(address.charCodeAt(i), 0));
+      this._sock.send(arr);
+    }
+
+    var arr = [];
+    arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Return, 1));
+    arr = arr.concat(RFB.messages.keyEvent(Keys.XK_Return, 0));
+    this._sock.send(arr);
+
+  },
 
 	xvpOp: function (ver, op) {
 		if (this._rfb_xvp_ver < ver) { return false; }
